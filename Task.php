@@ -47,20 +47,16 @@ class Task
             switch ($current_status) {
                 case self::STATUSES['new']:
                     return self::ACTIONS['to_refuse'];
-                    break;
                 case self::STATUSES['in_progress']:
                     return self::ACTIONS['to_confirm'];
-                    break;
             }
         }
         if ($role = "executor") {
             switch ($current_status) {
                 case self::STATUSES['new']:
                     return self::ACTIONS['to_take_to_work'];
-                    break;
                 case self::STATUSES['in_progress']:
                     return self::ACTIONS['to_refuse'];
-                    break;
             }
         }
     }
@@ -69,19 +65,14 @@ class Task
         switch ($action) {
             case self::ACTIONS['to_cancel']:
                 return self::STATUSES['canceled'];
-                break;
             case self::ACTIONS['to_confirm']:
                 return self::STATUSES['done'];
-                break;
             case self::ACTIONS['to_refuse']:
                 return self::STATUSES['fail'];
-                break;
             case self::ACTIONS['to_take_to_work']:
                 return self::STATUSES['in_progress'];
-                break;
             default:
                 return self::STATUSES['new'];
-                break;
         }
     }
 }
