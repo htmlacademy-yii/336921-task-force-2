@@ -2,8 +2,10 @@
 
 require_once'Task.php';
 
-$role = "customer";
-$task = new Task(1, 2, $role);
+$role = "executor";
+$current_status = "in_progress";
+
+$task = new Task($current_status, 1, 2, $role);
 $getActions = $task->getAllActions();
 $getStatuses = $task->getAllStatuses();
 print("<h2>Все значения статусов</h2>");

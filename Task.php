@@ -3,29 +3,41 @@
 
 class Task
 {
-
+    private $current_status;                   //Текущий статус, обязательное
     private $customer_id;                      //ID заказчика
     private $executor_id;                      //ID исполнителя
     private $role;                             //Роль пользователя, совершившего действие
-    private $actions = [];
-    private $statuses = [];
 
-    const STATUS_NEW = "new";
-    const STATUS_CANCELED = "canceled";
-    const STATUS_PROGRESS = "in_progress";
-    const STATUS_DONE = "done";
-    const STATUS_FAILED = "fail";
+    const STATUS_NEW = "new";                  //Статус новое
+    const STATUS_CANCELED = "canceled";        //Статус отменено
+    const STATUS_PROGRESS = "in_progress";     //Статус в работе
+    const STATUS_DONE = "done";                //Статус выполнено
+    const STATUS_FAILED = "fail";              //Статус провалено
+    const STATUSES = [
+        self::STATUS_NEW => "Новое",
+        self::STATUS_DONE => "Выполнено",
+        self::STATUS_CANCELED => "Отменено",
+        self::STATUS_PROGRESS => "В работе",
+        self::STATUS_FAILED => "Провалено"
+    ];
 
-    const ACTION_TO_CANCEL = "cancel";
-    const ACTION_TO_TAKE_TO_WORK = "take_to_work";
-    const ACTION_TO_REFUSE = "refuse";
-    const ACTION_TO_CONFIRM = "confirm";
+    const ACTION_TO_CANCEL = "cancel";             //Отменить
+    const ACTION_TO_TAKE_TO_WORK = "take_to_work"; //Откликнуться
+    const ACTION_TO_REFUSE = "refuse";             //Отказаться
+    const ACTION_TO_CONFIRM = "confirm";           //Выполнено (подтвердить выполнение)
+    const ACTIONS = [
+        self::ACTION_TO_CANCEL => "Отменить",
+        self::ACTION_TO_CONFIRM => "Выполнено",
+        self::ACTION_TO_REFUSE => "Отказаться",
+        self::ACTION_TO_TAKE_TO_WORK => "Откликнуться"
+    ];
 
     const ROLE_CUSTOMER = "customer";
     const ROLE_EXECUTOR = "executor";
 
-    public function __construct($customer_id, $executor_id, $role)
+    public function __construct($current_status, $customer_id, $executor_id, $role)
     {
+        $this->current_status = $current_status;
         $this->customer_id = $customer_id;
         $this->executor_id = $executor_id;
         $this->role = $role;
@@ -36,13 +48,7 @@ class Task
      **/
     public function getAllActions()
     {
-        $actions = [
-            self::ACTION_TO_CANCEL => "Отменить",
-            self::ACTION_TO_CONFIRM => "Выполнено",
-            self::ACTION_TO_REFUSE => "Отказаться",
-            self::ACTION_TO_TAKE_TO_WORK => "Откликнуться"
-        ];
-        return $actions;
+        return self::ACTIONS;
     }
 
     /**
@@ -50,14 +56,7 @@ class Task
      **/
     public function getAllStatuses()
     {
-        $statuses = [
-            self::STATUS_NEW => "Новое",
-            self::STATUS_DONE => "Выполнено",
-            self::STATUS_CANCELED => "Отменено",
-            self::STATUS_PROGRESS => "В работе",
-            self::STATUS_FAILED => "Провалено"
-        ];
-        return $statuses;
+        return self::STATUSES;
     }
 
     /**
@@ -65,15 +64,15 @@ class Task
      **/
     private function getActions($current_status, $role)
     {
-        if ($role = self::ROLE_CUSTOMER) {
+        if ($this->role == self::ROLE_CUSTOMER) {
             switch ($current_status) {
                 case self::STATUS_NEW:
-                    return self::ACTION_TO_REFUSE;
+                    return self::ACTION_TO_CANCEL;
                 case self::STATUS_PROGRESS:
                     return self::ACTION_TO_CONFIRM;
             }
         }
-        if ($role = self::ROLE_EXECUTOR) {
+        if ($this->role == self::ROLE_EXECUTOR) {
             switch ($current_status) {
                 case self::STATUS_NEW:
                     return self::ACTION_TO_TAKE_TO_WORK;
