@@ -35,7 +35,7 @@ class Task
     const ROLE_CUSTOMER = "customer";
     const ROLE_EXECUTOR = "executor";
 
-    public function __construct($current_status, $customer_id, $executor_id, $role)
+    public function __construct(string $current_status, int $customer_id, int $executor_id, string $role)
     {
         $this->current_status = $current_status;
         $this->customer_id = $customer_id;
@@ -46,7 +46,7 @@ class Task
     /**
      * Определять список из всех доступных действий
      **/
-    public function getAllActions()
+    public function getAllActions(): array
     {
         return self::ACTIONS;
     }
@@ -54,7 +54,7 @@ class Task
     /**
      * Определять список из всех доступных статусов
      **/
-    public function getAllStatuses()
+    public function getAllStatuses(): array
     {
         return self::STATUSES;
     }
@@ -62,7 +62,7 @@ class Task
     /**
      * Определять список доступных действий в текущем статусе
      **/
-    private function getActions($current_status, $role)
+    private function getActions(string $current_status, string $role): string
     {
         if ($this->role == self::ROLE_CUSTOMER) {
             switch ($current_status) {
@@ -85,7 +85,7 @@ class Task
     /**
      * Возвращать имя статуса, в который перейдёт задание после выполнения конкретного действия
      **/
-    public function getNextStatus($action)
+    public function getNextStatus(string $action): string
     {
         switch ($action) {
             case self::ACTION_TO_CANCEL:
