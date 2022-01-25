@@ -3,10 +3,10 @@
 
 class Task
 {
-    private $current_status;                   //Текущий статус, обязательное
-    private $customer_id;                      //ID заказчика
-    private $executor_id;                      //ID исполнителя
-    private $role;                             //Роль пользователя, совершившего действие
+    private string $current_status;                   //Текущий статус, обязательное
+    private int $customer_id;                         //ID заказчика
+    private int $executor_id;                         //ID исполнителя
+    private string $role;                             //Роль пользователя, совершившего действие
 
     const STATUS_NEW = "new";                  //Статус новое
     const STATUS_CANCELED = "canceled";        //Статус отменено
@@ -62,18 +62,18 @@ class Task
     /**
      * Определять список доступных действий в текущем статусе
      **/
-    private function getActions(string $current_status, string $role): string
+    private function getActions(string $role): string
     {
-        if ($this->role == self::ROLE_CUSTOMER) {
-            switch ($current_status) {
+        if ($role == self::ROLE_CUSTOMER) {
+            switch ($this->current_status) {
                 case self::STATUS_NEW:
                     return self::ACTION_TO_CANCEL;
                 case self::STATUS_PROGRESS:
                     return self::ACTION_TO_CONFIRM;
             }
         }
-        if ($this->role == self::ROLE_EXECUTOR) {
-            switch ($current_status) {
+        if ($role == self::ROLE_EXECUTOR) {
+            switch ($this->current_status) {
                 case self::STATUS_NEW:
                     return self::ACTION_TO_TAKE_TO_WORK;
                 case self::STATUS_PROGRESS:
