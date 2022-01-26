@@ -46,7 +46,7 @@ class Task
     /**
      * Определять список из всех доступных действий
      **/
-    public function getAllActions(): array
+    public function getActionTitles(): array
     {
         return self::ACTIONS;
     }
@@ -54,7 +54,7 @@ class Task
     /**
      * Определять список из всех доступных статусов
      **/
-    public function getAllStatuses(): array
+    public function getStatusTitles(): array
     {
         return self::STATUSES;
     }
@@ -80,6 +80,7 @@ class Task
                     return self::ACTION_TO_REFUSE;
             }
         }
+        return '';
     }
 
     /**
