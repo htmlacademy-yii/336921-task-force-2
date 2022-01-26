@@ -62,7 +62,7 @@ class Task
     /**
      * Определять список доступных действий в текущем статусе
      **/
-    private function getActions(string $role): string
+    public function getActions(string $role): string
     {
         if ($role == self::ROLE_CUSTOMER) {
             switch ($this->current_status) {
