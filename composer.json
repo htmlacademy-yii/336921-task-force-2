@@ -1,0 +1,16 @@
+{
+    "name": "nerodemiurgo/taskforce",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "nerodemiurgo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nerodemiurgo",
+            "email": "nerodemiurgo@gmail.com"
+        }
+    ],
+    "require": {}
+}
