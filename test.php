@@ -1,6 +1,8 @@
 <?php
 
-require_once 'Task.php';
+use nerodemiurgo\business\Task;
+
+require_once "vendor/autoload.php";
 
 $taskStatusProgress = new Task(Task::STATUS_PROGRESS, 1, 2, Task::ROLE_EXECUTOR);
 
