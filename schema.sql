@@ -16,13 +16,13 @@
 
 
 -- Дамп структуры базы данных taskforce
-CREATE DATABASE IF NOT EXISTS `taskforce` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `taskforce` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 USE `taskforce`;
 
 -- Дамп структуры для таблица taskforce.category
 CREATE TABLE IF NOT EXISTS `category` (
   `id` int NOT NULL,
-  `name` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Справочник со значениями категорий';
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `category` (
 -- Дамп структуры для таблица taskforce.city
 CREATE TABLE IF NOT EXISTS `city` (
   `id` int NOT NULL,
-  `name` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -56,48 +56,27 @@ CREATE TABLE IF NOT EXISTS `review` (
   `executor_id` int NOT NULL,
   `task_id` int NOT NULL,
   `mark` int NOT NULL,
-  `comment` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `comment` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп данных таблицы taskforce.review: ~0 rows (приблизительно)
 
--- Дамп структуры для таблица taskforce.role
-CREATE TABLE IF NOT EXISTS `role` (
-  `id` int NOT NULL,
-  `name` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Дамп данных таблицы taskforce.role: ~0 rows (приблизительно)
-INSERT INTO `role` (`id`, `name`) VALUES
-	(1, 'ROLE_CUSTOMER'),
-	(2, 'ROLE_EXECUTOR');
-
--- Дамп структуры для таблица taskforce.status
-CREATE TABLE IF NOT EXISTS `status` (
-  `id` int NOT NULL,
-  `name` char(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Дамп данных таблицы taskforce.status: ~0 rows (приблизительно)
-
 -- Дамп структуры для таблица taskforce.task
 CREATE TABLE IF NOT EXISTS `task` (
   `id` int NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `name` char(50) NOT NULL,
+  `name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `description` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `category_id` int NOT NULL DEFAULT '0',
   `budget` int NOT NULL DEFAULT '0',
-  `finish_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `status_id` int NOT NULL DEFAULT '0',
+  `finished_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `status` char(50) NOT NULL DEFAULT 'STATUS_NEW',
   `lat` float DEFAULT '0',
   `lng` float DEFAULT '0',
   `city_id` int DEFAULT NULL,
-  `customer_id` int NOT NULL,
-  `executor_id` int DEFAULT NULL,
+  `customer_user_id` int NOT NULL,
+  `executor_user_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -117,18 +96,18 @@ CREATE TABLE IF NOT EXISTS `task_file` (
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int NOT NULL,
   `registered_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `activity_status` int NOT NULL DEFAULT '1',
-  `role_id` int NOT NULL DEFAULT '1',
-  `email` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
-  `password` char(50) NOT NULL,
-  `name` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `status` int NOT NULL DEFAULT '1',
+  `role` char(50) NOT NULL DEFAULT 'ROLE_CUSTOMER',
+  `email` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `password` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
   `telephone` int DEFAULT '0',
   `telegram` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `birthday` date DEFAULT NULL,
   `about` mediumtext,
   `city_id` int DEFAULT NULL,
   `avatar` char(50) DEFAULT NULL,
-  `close_contact` tinyint DEFAULT NULL,
+  `show_contact` tinyint DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
