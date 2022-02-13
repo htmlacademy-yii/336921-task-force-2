@@ -2,12 +2,19 @@
 
 namespace nerodemiurgo\business;
 
+use nerodemiurgo\business\Action;
+use nerodemiurgo\business\CancelAction;
+use nerodemiurgo\business\ConfirmAction;
+use nerodemiurgo\business\RefuseAction;
+use nerodemiurgo\business\TakeToWorkAction;
+
 class Task
 {
     private string $current_status;                   //Текущий статус, обязательное
     private int $customer_id;                         //ID заказчика
     private int $executor_id;                         //ID исполнителя
     private string $role;                             //Роль пользователя, совершившего действие
+    private int $user_id;                             //Идентификатор текущего пользователя
 
     const STATUS_NEW = "new";                  //Статус новое
     const STATUS_CANCELED = "canceled";        //Статус отменено
@@ -36,12 +43,13 @@ class Task
     const ROLE_CUSTOMER = "customer";
     const ROLE_EXECUTOR = "executor";
 
-    public function __construct(string $current_status, int $customer_id, int $executor_id, string $role)
+    public function __construct(string $current_status, int $customer_id, int $executor_id, string $role, int $user_id)
     {
         $this->current_status = $current_status;
         $this->customer_id = $customer_id;
         $this->executor_id = $executor_id;
         $this->role = $role;
+        $this->user_id = $user_id;
     }
 
     /**
@@ -63,25 +71,27 @@ class Task
     /**
      * Определять список доступных действий в текущем статусе
      **/
-    public function getActions(string $role): string
+    public function getActions(): ?object
     {
-        if ($role == self::ROLE_CUSTOMER) {
-            switch ($this->current_status) {
-                case self::STATUS_NEW:
-                    return self::ACTION_TO_CANCEL;
-                case self::STATUS_PROGRESS:
-                    return self::ACTION_TO_CONFIRM;
+        if ($this->role === self::ROLE_CUSTOMER) {
+            if ($this->current_status === self::STATUS_NEW) {
+                return new CancelAction();
             }
-        }
-        if ($role == self::ROLE_EXECUTOR) {
-            switch ($this->current_status) {
-                case self::STATUS_NEW:
-                    return self::ACTION_TO_TAKE_TO_WORK;
-                case self::STATUS_PROGRESS:
-                    return self::ACTION_TO_REFUSE;
+            if ($this->current_status === self::STATUS_PROGRESS) {
+                return new ConfirmAction();
             }
+            return null;
         }
-        return '';
+        if ($this->role === self::ROLE_EXECUTOR) {
+            if ($this->current_status === self::STATUS_NEW) {
+                return new TakeToWorkAction();
+            }
+            if ($this->current_status === self::STATUS_PROGRESS) {
+                return new RefuseAction();
+            }
+            return null;
+        }
+        return null;
     }
 
     /**
@@ -89,17 +99,12 @@ class Task
      **/
     public function getNextStatus(string $action): string
     {
-        switch ($action) {
-            case self::ACTION_TO_CANCEL:
-                return self::STATUS_CANCELED;
-            case self::ACTION_TO_CONFIRM:
-                return self::STATUS_DONE;
-            case self::ACTION_TO_REFUSE:
-                return self::STATUS_FAILED;
-            case self::ACTION_TO_TAKE_TO_WORK:
-                return self::STATUS_PROGRESS;
-            default:
-                return self::STATUS_NEW;
-        }
+        return match ($action) {
+            self::ACTION_TO_CANCEL => self::STATUS_CANCELED,
+            self::ACTION_TO_CONFIRM => self::STATUS_DONE,
+            self::ACTION_TO_REFUSE => self::STATUS_FAILED,
+            self::ACTION_TO_TAKE_TO_WORK => self::STATUS_PROGRESS,
+            default => self::STATUS_NEW,
+        };
     }
 }
