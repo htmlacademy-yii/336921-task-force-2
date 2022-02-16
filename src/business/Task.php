@@ -3,10 +3,6 @@
 namespace nerodemiurgo\business;
 
 use nerodemiurgo\business\Action;
-use nerodemiurgo\business\CancelAction;
-use nerodemiurgo\business\ConfirmAction;
-use nerodemiurgo\business\RefuseAction;
-use nerodemiurgo\business\TakeToWorkAction;
 
 class Task
 {
@@ -43,13 +39,12 @@ class Task
     const ROLE_CUSTOMER = "customer";
     const ROLE_EXECUTOR = "executor";
 
-    public function __construct(string $current_status, int $customer_id, int $executor_id, string $role, int $user_id)
+    public function __construct(string $current_status, int $customer_id, int $executor_id, string $role)
     {
         $this->current_status = $current_status;
         $this->customer_id = $customer_id;
         $this->executor_id = $executor_id;
         $this->role = $role;
-        $this->user_id = $user_id;
     }
 
     /**
@@ -71,25 +66,27 @@ class Task
     /**
      * Определять список доступных действий в текущем статусе
      **/
-    public function getActions(): ?object
+    public function getActions($user_id): ?object
     {
         if ($this->role === self::ROLE_CUSTOMER) {
-            if ($this->current_status === self::STATUS_NEW) {
+            $action = new CancelAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
                 return new CancelAction();
             }
-            if ($this->current_status === self::STATUS_PROGRESS) {
+            $action = new ConfirmAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
                 return new ConfirmAction();
             }
-            return null;
         }
         if ($this->role === self::ROLE_EXECUTOR) {
-            if ($this->current_status === self::STATUS_NEW) {
-                return new TakeToWorkAction();
-            }
-            if ($this->current_status === self::STATUS_PROGRESS) {
+            $action = new RefuseAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
                 return new RefuseAction();
             }
-            return null;
+            $action = new TakeToWorkAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
+                return new TakeToWorkAction();
+            }
         }
         return null;
     }

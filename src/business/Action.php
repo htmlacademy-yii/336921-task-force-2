@@ -4,12 +4,15 @@
 namespace nerodemiurgo\business;
 
 
-interface Action
+abstract class Action
 {
-    public function getTitle(): string;
+    public string $title;
+    public string $code;
 
-    public function getCode(): string;
+    abstract public function getTitle(): string;
 
-    public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool;
+    abstract public function getCode(): string;
+
+    abstract public function checkAccess(int $customer_id, int $executor_id, int $user_id, string $current_status): bool;
 
 }

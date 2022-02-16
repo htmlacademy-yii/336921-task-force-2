@@ -4,22 +4,28 @@
 namespace nerodemiurgo\business;
 
 
-class RefuseAction implements Action
+class RefuseAction extends Action
 {
+
+    public function __construct()
+    {
+        $this->title = 'Отказаться';
+        $this->code = 'refuse';
+    }
 
     public function getTitle(): string
     {
-        return 'Отказаться';
+        return $this->title;
     }
 
     public function getCode(): string
     {
-        return 'refuse';
+        return $this->code;
     }
 
     public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool
     {
-        if ($user_id === $executor_id & $current_status === "in_progress") {
+        if ($user_id === $executor_id && $current_status === Task::STATUS_PROGRESS) {
             return true;
         } else return false;
     }

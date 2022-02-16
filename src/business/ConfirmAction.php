@@ -4,22 +4,27 @@
 namespace nerodemiurgo\business;
 
 
-class ConfirmAction implements Action
+class ConfirmAction extends Action
 {
+    public function __construct()
+    {
+        $this->title = 'Выполнено';
+        $this->code = 'confirm';
+    }
 
     public function getTitle(): string
     {
-        return 'Выполнено';
+        return $this->title;
     }
 
     public function getCode(): string
     {
-        return 'confirm';
+        return $this->code;
     }
 
     public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool
     {
-        if ($user_id === $customer_id & $current_status === "in_progress") {
+        if ($user_id === $customer_id && $current_status === Task::STATUS_PROGRESS) {
             return true;
         } else return false;
     }
