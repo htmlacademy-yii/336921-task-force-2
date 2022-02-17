@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace nerodemiurgo\business;
 
@@ -65,27 +66,29 @@ class Task
 
     /**
      * Определять список доступных действий в текущем статусе
+     * @return ?Action
      **/
-    public function getActions($user_id): ?object
+
+    public function getAction($user_id): ?object
     {
         if ($this->role === self::ROLE_CUSTOMER) {
             $action = new CancelAction();
             if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
-                return new CancelAction();
+                return $action;
             }
             $action = new ConfirmAction();
             if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
-                return new ConfirmAction();
+                return $action;
             }
         }
         if ($this->role === self::ROLE_EXECUTOR) {
             $action = new RefuseAction();
             if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
-                return new RefuseAction();
+                return $action;
             }
             $action = new TakeToWorkAction();
             if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
-                return new TakeToWorkAction();
+                return $action;
             }
         }
         return null;

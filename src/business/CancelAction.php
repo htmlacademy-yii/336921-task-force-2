@@ -14,7 +14,7 @@ class CancelAction extends Action
 
     public function getTitle(): string
     {
-        return $this->title;
+        return 'Отменить';
     }
 
     public function getCode(): string
@@ -24,8 +24,6 @@ class CancelAction extends Action
 
     public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool
     {
-        if ($user_id === $customer_id && $current_status === Task::STATUS_NEW) {
-            return true;
-        } else return false;
+        return ($user_id === $customer_id && $current_status === Task::STATUS_NEW);
     }
 }

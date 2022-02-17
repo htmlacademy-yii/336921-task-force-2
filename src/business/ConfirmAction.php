@@ -24,8 +24,6 @@ class ConfirmAction extends Action
 
     public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool
     {
-        if ($user_id === $customer_id && $current_status === Task::STATUS_PROGRESS) {
-            return true;
-        } else return false;
+        return ($user_id === $customer_id && $current_status === Task::STATUS_PROGRESS);
     }
 }
