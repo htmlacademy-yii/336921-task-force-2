@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace nerodemiurgo\business;
+
+use nerodemiurgo\business\Action;
 
 class Task
 {
@@ -8,6 +11,7 @@ class Task
     private int $customer_id;                         //ID заказчика
     private int $executor_id;                         //ID исполнителя
     private string $role;                             //Роль пользователя, совершившего действие
+    private int $user_id;                             //Идентификатор текущего пользователя
 
     const STATUS_NEW = "new";                  //Статус новое
     const STATUS_CANCELED = "canceled";        //Статус отменено
@@ -63,25 +67,30 @@ class Task
     /**
      * Определять список доступных действий в текущем статусе
      **/
-    public function getActions(string $role): string
+
+    public function getAction($user_id): ?Action
     {
-        if ($role == self::ROLE_CUSTOMER) {
-            switch ($this->current_status) {
-                case self::STATUS_NEW:
-                    return self::ACTION_TO_CANCEL;
-                case self::STATUS_PROGRESS:
-                    return self::ACTION_TO_CONFIRM;
+        if ($this->role === self::ROLE_CUSTOMER) {
+            $action = new CancelAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
+                return $action;
+            }
+            $action = new ConfirmAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
+                return $action;
             }
         }
-        if ($role == self::ROLE_EXECUTOR) {
-            switch ($this->current_status) {
-                case self::STATUS_NEW:
-                    return self::ACTION_TO_TAKE_TO_WORK;
-                case self::STATUS_PROGRESS:
-                    return self::ACTION_TO_REFUSE;
+        if ($this->role === self::ROLE_EXECUTOR) {
+            $action = new RefuseAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
+                return $action;
+            }
+            $action = new TakeToWorkAction();
+            if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
+                return $action;
             }
         }
-        return '';
+        return null;
     }
 
     /**
@@ -89,17 +98,12 @@ class Task
      **/
     public function getNextStatus(string $action): string
     {
-        switch ($action) {
-            case self::ACTION_TO_CANCEL:
-                return self::STATUS_CANCELED;
-            case self::ACTION_TO_CONFIRM:
-                return self::STATUS_DONE;
-            case self::ACTION_TO_REFUSE:
-                return self::STATUS_FAILED;
-            case self::ACTION_TO_TAKE_TO_WORK:
-                return self::STATUS_PROGRESS;
-            default:
-                return self::STATUS_NEW;
-        }
+        return match ($action) {
+            self::ACTION_TO_CANCEL => self::STATUS_CANCELED,
+            self::ACTION_TO_CONFIRM => self::STATUS_DONE,
+            self::ACTION_TO_REFUSE => self::STATUS_FAILED,
+            self::ACTION_TO_TAKE_TO_WORK => self::STATUS_PROGRESS,
+            default => self::STATUS_NEW,
+        };
     }
 }
