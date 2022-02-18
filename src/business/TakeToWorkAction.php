@@ -7,20 +7,14 @@ namespace nerodemiurgo\business;
 class TakeToWorkAction extends Action
 {
 
-    public function __construct()
-    {
-        $this->title = 'Откликнуться';
-        $this->code = 'take_to_work';
-    }
-
     public function getTitle(): string
     {
-        return $this->title;
+        return 'Откликнуться';
     }
 
     public function getCode(): string
     {
-        return $this->code;
+        return 'take_to_work';
     }
 
     public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool

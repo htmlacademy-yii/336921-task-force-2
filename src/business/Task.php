@@ -66,10 +66,9 @@ class Task
 
     /**
      * Определять список доступных действий в текущем статусе
-     * @return ?Action
      **/
 
-    public function getAction($user_id): ?object
+    public function getAction($user_id): ?Action
     {
         if ($this->role === self::ROLE_CUSTOMER) {
             $action = new CancelAction();

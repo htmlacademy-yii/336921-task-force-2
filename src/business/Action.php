@@ -6,9 +6,6 @@ namespace nerodemiurgo\business;
 
 abstract class Action
 {
-    protected string $title;
-    protected string $code;
-
     abstract public function getTitle(): string;
 
     abstract public function getCode(): string;

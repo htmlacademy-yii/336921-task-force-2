@@ -6,11 +6,6 @@ namespace nerodemiurgo\business;
 
 class CancelAction extends Action
 {
-    public function __construct()
-    {
-        $this->title = 'Отменить';
-        $this->code = 'cancel';
-    }
 
     public function getTitle(): string
     {
@@ -19,7 +14,7 @@ class CancelAction extends Action
 
     public function getCode(): string
     {
-        return $this->code;
+        return 'cancel';
     }
 
     public function checkAccess($customer_id, $executor_id, $user_id, $current_status): bool
