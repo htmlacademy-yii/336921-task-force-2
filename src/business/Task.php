@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace nerodemiurgo\business;
 
-use nerodemiurgo\business\Action;
+use nerodemiurgo\ex\CheckDataException;
 
 class Task
 {
@@ -11,14 +11,13 @@ class Task
     private int $customer_id;                         //ID заказчика
     private int $executor_id;                         //ID исполнителя
     private string $role;                             //Роль пользователя, совершившего действие
-    private int $user_id;                             //Идентификатор текущего пользователя
 
-    const STATUS_NEW = "new";                  //Статус новое
-    const STATUS_CANCELED = "canceled";        //Статус отменено
-    const STATUS_PROGRESS = "in_progress";     //Статус в работе
-    const STATUS_DONE = "done";                //Статус выполнено
-    const STATUS_FAILED = "fail";              //Статус провалено
-    const STATUSES = [
+    public const STATUS_NEW = "new";                  //Статус новое
+    public const STATUS_CANCELED = "canceled";        //Статус отменено
+    public const STATUS_PROGRESS = "in_progress";     //Статус в работе
+    public const STATUS_DONE = "done";                //Статус выполнено
+    public const STATUS_FAILED = "fail";              //Статус провалено
+    public const STATUSES = [
         self::STATUS_NEW => "Новое",
         self::STATUS_DONE => "Выполнено",
         self::STATUS_CANCELED => "Отменено",
@@ -26,22 +25,29 @@ class Task
         self::STATUS_FAILED => "Провалено"
     ];
 
-    const ACTION_TO_CANCEL = "cancel";             //Отменить
-    const ACTION_TO_TAKE_TO_WORK = "take_to_work"; //Откликнуться
-    const ACTION_TO_REFUSE = "refuse";             //Отказаться
-    const ACTION_TO_CONFIRM = "confirm";           //Выполнено (подтвердить выполнение)
-    const ACTIONS = [
+    public const ACTION_TO_CANCEL = "cancel";             //Отменить
+    public const ACTION_TO_TAKE_TO_WORK = "take_to_work"; //Откликнуться
+    public const ACTION_TO_REFUSE = "refuse";             //Отказаться
+    public const ACTION_TO_CONFIRM = "confirm";           //Выполнено (подтвердить выполнение)
+    public const ACTIONS = [
         self::ACTION_TO_CANCEL => "Отменить",
         self::ACTION_TO_CONFIRM => "Выполнено",
         self::ACTION_TO_REFUSE => "Отказаться",
         self::ACTION_TO_TAKE_TO_WORK => "Откликнуться"
     ];
 
-    const ROLE_CUSTOMER = "customer";
-    const ROLE_EXECUTOR = "executor";
+    public const ROLE_CUSTOMER = "customer";
+    public const ROLE_EXECUTOR = "executor";
 
+    /**
+     * @throws CheckDataException
+     */
     public function __construct(string $current_status, int $customer_id, int $executor_id, string $role)
     {
+        if (!array_key_exists($current_status, self::STATUSES)) {
+            throw new CheckDataException("Полученный статус не существует");
+        }
+
         $this->current_status = $current_status;
         $this->customer_id = $customer_id;
         $this->executor_id = $executor_id;
@@ -66,7 +72,9 @@ class Task
 
     /**
      * Определять список доступных действий в текущем статусе
-     **/
+     *
+     * @throws CheckDataException
+     */
 
     public function getAction($user_id): ?Action
     {
@@ -80,7 +88,7 @@ class Task
                 return $action;
             }
         }
-        if ($this->role === self::ROLE_EXECUTOR) {
+        elseif ($this->role === self::ROLE_EXECUTOR) {
             $action = new RefuseAction();
             if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
                 return $action;
@@ -89,15 +97,22 @@ class Task
             if ($action->checkAccess($this->customer_id, $this->executor_id, $user_id, $this->current_status)) {
                 return $action;
             }
+        } else {
+            throw new CheckDataException("Роль пользователя не определена");
         }
         return null;
     }
 
     /**
      * Возвращать имя статуса, в который перейдёт задание после выполнения конкретного действия
-     **/
+     *
+     * @throws CheckDataException
+     */
     public function getNextStatus(string $action): string
     {
+        if (!array_key_exists($action, self::ACTIONS)) {
+            throw new CheckDataException("Полученное действие не существует");
+        }
         return match ($action) {
             self::ACTION_TO_CANCEL => self::STATUS_CANCELED,
             self::ACTION_TO_CONFIRM => self::STATUS_DONE,
