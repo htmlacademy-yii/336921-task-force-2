@@ -3,7 +3,6 @@
 
 namespace nerodemiurgo\data_processing;
 
-use nerodemiurgo\ex\CheckDataException;
 use nerodemiurgo\ex\FileFormatException;
 use nerodemiurgo\ex\SourceFileException;
 
@@ -13,7 +12,7 @@ class CsvImporter
     private string $sqltablename;
     private array $columns;
     private array $result = [];
-    protected $fp;
+    public mixed $fp;
 
     public function __construct($filename, $sqltablename, $columns)
     {
@@ -44,9 +43,10 @@ class CsvImporter
 
         $header_data = $this->getHeaderData();
 
-        if ($header_data !== $this->columns) {
-            throw new FileFormatException("Исходный файл не содержит необходимых столбцов");
+        if (count($header_data) !== count($this->columns)) {
+            throw new FileFormatException("Число столбцов файла не соответствует количеству заголовков");
         }
+
 
         while ($line = $this->getNextLine()) {
             $this->result[] = $line;
@@ -61,9 +61,7 @@ class CsvImporter
     public function getHeaderData(): ?array
     {
         rewind($this->fp);
-        $data = fgetcsv($this->fp);
-
-        return $data;
+        return fgetcsv($this->fp);
     }
 
     private function getNextLine(): ?array
@@ -96,20 +94,26 @@ class CsvImporter
 
     /**
      * Создает массив из CSV
+     * @throws FileFormatException
      */
     public function makeArrayFromCsv(): array
     {
-        $this->import();
+        try {
+            $this->import();
+        } catch (SourceFileException $e) {
+            print("Ошибка импорта файла: " . $e);
+        }
         return $this->getData();
     }
 
     /**
      * Собирает файл sql
+     * @throws FileFormatException
      */
-    public function makeSql() :string
+    public function makeSql(): string
     {
         $data = $this->makeArrayFromCsv();
-        $columns_name = $this->getHeaderData();
+        $columns_name = $this->columns;
         $columns_name_string = $columns_name[0];
         $line_counter = count($data);
         $columns_counter = count($columns_name);
@@ -120,14 +124,18 @@ class CsvImporter
         }
 
         for ($i = 0; $i < $line_counter; $i++) {
-            $line_data_string = "'".$data[$i][0];
+            $line_data_string = "'" . $data[$i][0];
             for ($d = 1; $d < $columns_counter; $d++) {
-                $line_data_string = $line_data_string . "', '" . $data[$i][$d] . "'";
+                $line_data_string = $line_data_string . "', '" . $data[$i][$d];
             }
-            $insert_line = "INSERT INTO " . $this->sqltablename . " (" . $columns_name_string . ") VALUES (" . $line_data_string . ");";
-            $data_sql = $data_sql."<br>".$insert_line;
+            $insert_line = "INSERT INTO " . $this->sqltablename . " (" . $columns_name_string . ") VALUES (" . $line_data_string . "');";
+            $data_sql = $data_sql . "\n" . $insert_line;
         }
+
+        $sql_file_name = "../../data/sql/" . $this->sqltablename . ".sql";
+        $fp_for_sql = fopen($sql_file_name, "w");
+        fwrite($fp_for_sql, $data_sql);
+        fclose($fp_for_sql);
         return $data_sql;
     }
-
 }

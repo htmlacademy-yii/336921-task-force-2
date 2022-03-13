@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `city`
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`),
     `lat`              float,
-    `long`              float
+    `lng`              float
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `task`
     `finished_at`      datetime                                                             DEFAULT CURRENT_TIMESTAMP,
     `status`           char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   NOT NULL,
     `lat`              float                                                                DEFAULT '0',
-    `long`             float                                                                DEFAULT '0',
+    `lng`             float                                                                DEFAULT '0',
     `city_id`          int                                                                  DEFAULT NULL,
     `customer_user_id` int                                                         NOT NULL,
     `executor_user_id` int                                                                  DEFAULT NULL,
