@@ -5,19 +5,20 @@ namespace nerodemiurgo\data_processing;
 
 use nerodemiurgo\ex\FileFormatException;
 use nerodemiurgo\ex\SourceFileException;
+use SplFileObject;
 
 class CsvImporter
 {
     private string $filename;
-    private string $sqltablename;
+    private string $sqlTableName;
     private array $columns;
     private array $result = [];
-    public mixed $fp;
+    public object $fp;
 
-    public function __construct($filename, $sqltablename, $columns)
+    public function __construct($filename, $sqlTableName, $columns)
     {
-        $this->filename = realpath("../../data") . $filename;
-        $this->sqltablename = $sqltablename;
+        $this->filename = realpath("./data") . $filename;
+        $this->sqlTableName = $sqlTableName;
         $this->columns = $columns;
     }
 
@@ -27,28 +28,22 @@ class CsvImporter
      */
     public function import(): void
     {
-        if (!$this->validateColumns($this->columns)) {
-            throw new FileFormatException("Заданы неверные заголовки столбцов");
-        }
-
         if (!file_exists($this->filename)) {
             throw new SourceFileException("Файл не существует");
         }
 
-        $this->fp = fopen($this->filename, 'r');
-
-        if (!$this->fp) {
-            throw new SourceFileException("Не удалось открыть файл на чтение");
-        }
-
+        $this->fp = new SplFileObject($this->filename);
         $header_data = $this->getHeaderData();
+
+        if (!$this->validateColumns($this->columns)) {
+            throw new FileFormatException("Заданы неверные заголовки столбцов");
+        }
 
         if (count($header_data) !== count($this->columns)) {
             throw new FileFormatException("Число столбцов файла не соответствует количеству заголовков");
         }
 
-
-        while ($line = $this->getNextLine()) {
+        foreach ($this->getNextLine() as $line) {
             $this->result[] = $line;
         }
     }
@@ -60,19 +55,16 @@ class CsvImporter
 
     public function getHeaderData(): ?array
     {
-        rewind($this->fp);
-        return fgetcsv($this->fp);
+        $this->fp->rewind();
+        return $this->fp->fgetcsv();
     }
 
-    private function getNextLine(): ?array
+    private function getNextLine(): ?iterable
     {
-        $result = null;
-
-        if (!feof($this->fp)) {
-            $result = fgetcsv($this->fp);
+        while (!$this->fp->eof()) {
+            yield $this->fp->fgetcsv();
         }
-
-        return $result;
+        return true;
     }
 
     private function validateColumns(array $columns): bool
@@ -93,7 +85,7 @@ class CsvImporter
     }
 
     /**
-     * Создает массив из CSV
+     * Создает массив из файла CSV
      * @throws FileFormatException
      */
     public function makeArrayFromCsv(): array
@@ -128,11 +120,11 @@ class CsvImporter
             for ($d = 1; $d < $columns_counter; $d++) {
                 $line_data_string = $line_data_string . "', '" . $data[$i][$d];
             }
-            $insert_line = "INSERT INTO " . $this->sqltablename . " (" . $columns_name_string . ") VALUES (" . $line_data_string . "');";
+            $insert_line = "INSERT INTO " . $this->sqlTableName . " (" . $columns_name_string . ") VALUES (" . $line_data_string . "');";
             $data_sql = $data_sql . "\n" . $insert_line;
         }
 
-        $sql_file_name = "../../data/sql/" . $this->sqltablename . ".sql";
+        $sql_file_name = "./data/sql/" . $this->sqlTableName . ".sql";
         $fp_for_sql = fopen($sql_file_name, "w");
         fwrite($fp_for_sql, $data_sql);
         fclose($fp_for_sql);
