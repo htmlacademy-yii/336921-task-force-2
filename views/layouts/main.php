@@ -14,9 +14,10 @@ $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
+    <?php
+    $this->head() ?>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="/web/css/style.css">
     <?php
     $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
@@ -29,7 +30,8 @@ $this->beginBody() ?>
 <header class="page-header">
     <nav class="main-nav">
         <a href='#' class="header-logo">
-            <img class="logo-image" src="/web/img/logotype.png" width=227 height=60 alt="taskforce">
+            <img class="logo-image" src="<?= yii\helpers\Url::to('img/logotype.png') ?>" width=227 height=60
+                 alt="taskforce">
         </a>
         <div class="nav-wrapper">
             <ul class="nav-list">
@@ -50,7 +52,8 @@ $this->beginBody() ?>
     </nav>
     <div class="user-block">
         <a href="#">
-            <img class="user-photo" src="/web/img/man-glasses.png" width="55" height="55" alt="Аватар">
+            <img class="user-photo" src="<?= yii\helpers\Url::to('img/man-glasses.png') ?>" width="55" height="55"
+                 alt="Аватар">
         </a>
         <div class="user-menu">
             <p class="user-name">Василий</p>
