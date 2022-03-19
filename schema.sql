@@ -24,28 +24,26 @@ CREATE TABLE IF NOT EXISTS `category`
 (
     `id`   int                                                        NOT NULL AUTO_INCREMENT,
     `name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
-    `icon` char(50)  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+    `icon` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT ='Справочник со значениями категорий';
 
--- Дамп данных таблицы taskforce.category: ~0 rows (приблизительно)
+-- Экспортируемые данные не выделены.
 
 -- Дамп структуры для таблица taskforce.city
 CREATE TABLE IF NOT EXISTS `city`
 (
     `id`   int                                                        NOT NULL AUTO_INCREMENT,
     `name` char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+    `lat`  float                                                               DEFAULT NULL,
+    `lng`  float                                                               DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `name` (`name`),
-    `lat`              float,
-    `lng`              float
+    UNIQUE KEY `name` (`name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
-
--- Дамп данных таблицы taskforce.city: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица taskforce.response
 CREATE TABLE IF NOT EXISTS `response`
@@ -53,14 +51,17 @@ CREATE TABLE IF NOT EXISTS `response`
     `id`          int NOT NULL AUTO_INCREMENT,
     `task_id`     int NOT NULL,
     `executor_id` int NOT NULL,
-    `comment`     mediumtext,
+    `comment`     mediumtext COLLATE utf8mb4_general_ci,
     `price`       int NOT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY `task_response` (`task_id`),
+    KEY `task_executor` (`executor_id`),
+    CONSTRAINT `task_executor` FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`),
+    CONSTRAINT `task_response` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
--- Дамп данных таблицы taskforce.response: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица taskforce.review
 CREATE TABLE IF NOT EXISTS `review`
@@ -68,14 +69,17 @@ CREATE TABLE IF NOT EXISTS `review`
     `id`          int NOT NULL AUTO_INCREMENT,
     `executor_id` int NOT NULL,
     `task_id`     int NOT NULL,
-    `mark`        int,
+    `mark`        int DEFAULT NULL,
     `comment`     mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY `review_executor` (`executor_id`),
+    KEY `review_task` (`task_id`),
+    CONSTRAINT `review_executor` FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`),
+    CONSTRAINT `review_task` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
--- Дамп данных таблицы taskforce.review: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица taskforce.task
 CREATE TABLE IF NOT EXISTS `task`
@@ -89,16 +93,23 @@ CREATE TABLE IF NOT EXISTS `task`
     `finished_at`      datetime                                                             DEFAULT CURRENT_TIMESTAMP,
     `status`           char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   NOT NULL,
     `lat`              float                                                                DEFAULT '0',
-    `lng`             float                                                                DEFAULT '0',
+    `lng`              float                                                                DEFAULT '0',
     `city_id`          int                                                                  DEFAULT NULL,
     `customer_user_id` int                                                         NOT NULL,
     `executor_user_id` int                                                                  DEFAULT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY `task_category` (`category_id`),
+    KEY `city` (`city_id`),
+    KEY `executor` (`executor_user_id`),
+    KEY `customer` (`customer_user_id`),
+    CONSTRAINT `city` FOREIGN KEY (`city_id`) REFERENCES `city` (`id`),
+    CONSTRAINT `customer` FOREIGN KEY (`customer_user_id`) REFERENCES `user` (`id`),
+    CONSTRAINT `executor` FOREIGN KEY (`executor_user_id`) REFERENCES `user` (`id`),
+    CONSTRAINT `task_category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
--- Дамп данных таблицы taskforce.task: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица taskforce.task_file
 CREATE TABLE IF NOT EXISTS `task_file`
@@ -106,12 +117,13 @@ CREATE TABLE IF NOT EXISTS `task_file`
     `id`       int                                                       NOT NULL AUTO_INCREMENT,
     `task_id`  int                                                       NOT NULL,
     `file_url` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY `task` (`task_id`),
+    CONSTRAINT `task` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
--- Дамп данных таблицы taskforce.task_file: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица taskforce.user
 CREATE TABLE IF NOT EXISTS `user`
@@ -119,24 +131,25 @@ CREATE TABLE IF NOT EXISTS `user`
     `id`            int                                                        NOT NULL AUTO_INCREMENT,
     `registered_at` datetime                                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `status`        int                                                        NOT NULL,
-    `role`          char(50)                                                   NOT NULL,
+    `role`          char(50) COLLATE utf8mb4_general_ci                        NOT NULL,
     `email`         char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
     `password`      char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
     `name`          char(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
     `telephone`     int                                                                 DEFAULT '0',
     `telegram`      char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci           DEFAULT NULL,
     `birthday`      date                                                                DEFAULT NULL,
-    `about`         mediumtext,
+    `about`         mediumtext COLLATE utf8mb4_general_ci,
     `city_id`       int                                                                 DEFAULT NULL,
-    `avatar`        char(50)                                                            DEFAULT NULL,
+    `avatar`        char(50) COLLATE utf8mb4_general_ci                                 DEFAULT NULL,
     `show_contact`  tinyint                                                             DEFAULT '1',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `email` (`email`)
+    UNIQUE KEY `email` (`email`),
+    KEY `user_city` (`city_id`),
+    CONSTRAINT `user_city` FOREIGN KEY (`city_id`) REFERENCES `city` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
--- Дамп данных таблицы taskforce.user: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица taskforce.user_category
 CREATE TABLE IF NOT EXISTS `user_category`
@@ -144,12 +157,16 @@ CREATE TABLE IF NOT EXISTS `user_category`
     `id`          int NOT NULL AUTO_INCREMENT,
     `user_id`     int NOT NULL,
     `category_id` int NOT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY `user` (`user_id`),
+    KEY `category` (`category_id`),
+    CONSTRAINT `category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
+    CONSTRAINT `user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
--- Дамп данных таблицы taskforce.user_category: ~0 rows (приблизительно)
+
 
 /*!40103 SET TIME_ZONE = IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE = IFNULL(@OLD_SQL_MODE, '') */;
