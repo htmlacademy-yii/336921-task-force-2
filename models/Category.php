@@ -12,7 +12,7 @@ use Yii;
  * @property string $icon
  *
  * @property Task[] $tasks
- * @property Category[] $userCategories
+ * @property UserCategory[] $userCategories
  */
 class Category extends \yii\db\ActiveRecord
 {
@@ -40,7 +40,7 @@ class Category extends \yii\db\ActiveRecord
      */
     public function attributeLabels()
     {
-        return $t = [
+        return [
             'id' => 'ID',
             'name' => 'Name',
             'icon' => 'Icon',
@@ -64,6 +64,6 @@ class Category extends \yii\db\ActiveRecord
      */
     public function getUserCategories()
     {
-        return $this->hasMany(Category::className(), ['category_id' => 'id'])->inverseOf('category');
+        return $this->hasMany(UserCategory::className(), ['category_id' => 'id'])->inverseOf('category');
     }
 }

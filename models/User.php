@@ -27,7 +27,7 @@ use Yii;
  * @property Review[] $reviews
  * @property Task[] $tasks
  * @property Task[] $tasks0
- * @property Category[] $userCategories
+ * @property UserCategory[] $userCategories
  */
 class User extends \yii\db\ActiveRecord
 {
@@ -114,7 +114,7 @@ class User extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTasksWhereIamCustomer()
+    public function getTasksByCustomer()
     {
         return $this->hasMany(Task::className(), ['customer_user_id' => 'id'])->inverseOf('customerUser');
     }
@@ -124,7 +124,7 @@ class User extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTasksWhereIamExecutor()
+    public function getTasksByExecutor()
     {
         return $this->hasMany(Task::className(), ['executor_user_id' => 'id'])->inverseOf('executorUser');
     }
@@ -136,6 +136,6 @@ class User extends \yii\db\ActiveRecord
      */
     public function getUserCategories()
     {
-        return $this->hasMany(Category::className(), ['user_id' => 'id'])->inverseOf('user');
+        return $this->hasMany(UserCategory::className(), ['user_id' => 'id'])->inverseOf('user');
     }
 }
