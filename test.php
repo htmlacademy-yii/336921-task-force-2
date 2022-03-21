@@ -9,7 +9,7 @@ use nerodemiurgo\ex\CheckDataException;
 
 require_once "vendor/autoload.php";
 
-$taskStatusProgress = new Task(Task::STATUS_PROGRESS, 1, 2,"kkk");
+$taskStatusProgress = new Task(Task::STATUS_PROGRESS, 1, 2,Task::ROLE_EXECUTOR);
 
 assert(!empty($taskStatusProgress->getStatusTitles()), 'Перечень статусов не возвращается');
 assert(!empty($taskStatusProgress->getActionTitles()), 'Перечень экшнов не возвращается');
