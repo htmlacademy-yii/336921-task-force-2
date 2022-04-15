@@ -29,14 +29,14 @@ $this->beginBody() ?>
 
 <header class="page-header">
     <nav class="main-nav">
-        <a href='#' class="header-logo">
-            <img class="logo-image" src="<?= yii\helpers\Url::to('img/logotype.png') ?>" width=227 height=60
+        <a href='/' class="header-logo">
+            <img class="logo-image" src="<?= yii\helpers\Url::to('../img/logotype.png') ?>" width=227 height=60
                  alt="taskforce">
         </a>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item list-item--active">
-                    <a class="link link--nav">Новое</a>
+                    <a href="/tasks" class="link link--nav">Новое</a>
                 </li>
                 <li class="list-item">
                     <a href="#" class="link link--nav">Мои задания</a>
@@ -52,7 +52,7 @@ $this->beginBody() ?>
     </nav>
     <div class="user-block">
         <a href="#">
-            <img class="user-photo" src="<?= yii\helpers\Url::to('img/man-glasses.png') ?>" width="55" height="55"
+            <img class="user-photo" src="<?= yii\helpers\Url::to('../img/man-glasses.png') ?>" width="55" height="55"
                  alt="Аватар">
         </a>
         <div class="user-menu">
