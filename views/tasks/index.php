@@ -1,84 +1,81 @@
 <?php
-
-    $this->title = 'Новые задания';
+$this->title = 'Новые задания';
 ?>
-<section class="new-task">
-    <div class="new-task__wrapper">
-        <h1>Новые задания</h1>
-        <?php
-            if (count($tasks) > 0) :
-                foreach ($tasks as $task) :?>
-                    <div class="new-task__card">
-                        <div class="new-task__title">
-                            <a href="#" class="link-regular"><h2><?= $task->name ?></h2></a>
-                            <a class="new-task__type link-regular" href="#"><p><?= $task->category->name ?></p></a>
-                        </div>
-                        <div class="new-task__icon new-task__icon--<?= $task->category->icon ?>"></div>
-                        <p class="new-task_description">
-                            <?= $task->description ?>
-                        </p>
-                        <b class="new-task__price new-task__price--translation"><?= $task->budget ?><b> ₽</b></b>
-                        <p class="new-task__place"><?= $task->city->name ?></p>
-                        <span class="new-task__time"><?= Yii::$app->formatter->format(
-                                $task->created_at,
-                                'relativeTime'
-                            ) ?></span>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+
+<div class="left-column">
+    <h3 class="head-main head-task">Новые задания</h3>
+    <?php
+    if (count($tasks) > 0) :
+        foreach ($tasks as $task) : ?>
+    <div class="task-card">
+        <div class="header-task">
+            <a href="#" class="link link--block link--big"><?= $task->name ?></a>
+            <p class="price price--task"><?= $task->budget ?> ₽</p>
+        </div>
+        <p class="info-text"><span class="current-time"><?= Yii::$app->formatter->format(
+                                                                    $task->created_at,
+                                                                    'relativeTime'
+                                                                ) ?> </span>назад</p>
+        <p class="task-text"><?= $task->description ?></p>
+        <div class="footer-task">
+            <p class="info-text town-text"><?= $task->city->name ?></p>
+            <p class="info-text category-text"><?= $task->category->name ?></p>
+            <a href="#" class="button button--black">Смотреть Задание</a>
+        </div>
     </div>
-    <div class="new-task__pagination">
-        <ul class="new-task__pagination-list">
-            <li class="pagination__item">
-                <a href="#"></a>
+    <?php endforeach; ?>
+    <?php endif; ?>
+    <div class="pagination-wrapper">
+        <ul class="pagination-list">
+            <li class="pagination-item mark">
+                <a href="#" class="link link--page"></a>
             </li>
-            <li class="pagination__item pagination__item--current">
-                <a>1</a>
+            <li class="pagination-item">
+                <a href="#" class="link link--page">1</a>
             </li>
-            <li class="pagination__item">
-                <a href="#">2</a>
+            <li class="pagination-item pagination-item--active">
+                <a href="#" class="link link--page">2</a>
             </li>
-            <li class="pagination__item">
-                <a href="#">3</a>
+            <li class="pagination-item">
+                <a href="#" class="link link--page">3</a>
             </li>
-            <li class="pagination__item">
-                <a href="#"></a>
+            <li class="pagination-item mark">
+                <a href="#" class="link link--page"></a>
             </li>
         </ul>
     </div>
-</section>
-<section class="search-task">
-    <div class="search-task__wrapper">
-        <form class="search-task__form" name="test" method="post" action="#">
-            <fieldset class="search-task__categories">
-                <legend>Категории</legend>
-                <input class="visually-hidden checkbox__input" id="1" type="checkbox" name="" value="" checked>
-                <label for="1">Курьерские услуги</label>
-                <input class="visually-hidden checkbox__input" id="2" type="checkbox" name="" value="" checked>
-                <label for="2">Грузоперевозки</label>
-                <input class="visually-hidden checkbox__input" id="3" type="checkbox" name="" value="">
-                <label for="3">Переводы</label>
-                <input class="visually-hidden checkbox__input" id="4" type="checkbox" name="" value="">
-                <label for="4">Строительство и ремонт</label>
-                <input class="visually-hidden checkbox__input" id="5" type="checkbox" name="" value="">
-                <label for="5">Выгул животных</label>
-            </fieldset>
-            <fieldset class="search-task__categories">
-                <legend>Дополнительно</legend>
-                <input class="visually-hidden checkbox__input" id="6" type="checkbox" name="" value="">
-                <label for="6">Без откликов</label>
-                <input class="visually-hidden checkbox__input" id="7" type="checkbox" name="" value="" checked>
-                <label for="7">Удаленная работа</label>
-            </fieldset>
-            <label class="search-task__name" for="8">Период</label>
-            <select class="multiple-select input" id="8" size="1" name="time[]">
-                <option value="day">За день</option>
-                <option selected value="week">За неделю</option>
-                <option value="month">За месяц</option>
-            </select>
-            <label class="search-task__name" for="9">Поиск по названию</label>
-            <input class="input-middle input" id="9" type="search" name="q" placeholder="">
-            <button class="button" type="submit">Искать</button>
-        </form>
+</div>
+<div class="right-column">
+    <div class="right-card black">
+        <div class="search-form">
+            <form>
+                <h4 class="head-card">Категории</h4>
+                <div class="form-group">
+                    <div>
+                        <input type="checkbox" id="сourier-services" checked>
+                        <label class="control-label" for="сourier-services">Курьерские услуги</label>
+                        <input id="cargo-transportation" type="checkbox">
+                        <label class="control-label" for="cargo-transportation">Грузоперевозки</label>
+                        <input id="translations" type="checkbox">
+                        <label class="control-label" for="translations">Переводы</label>
+                    </div>
+                </div>
+                <h4 class="head-card">Дополнительно</h4>
+                <div class="form-group">
+                    <input id="without-performer" type="checkbox" checked>
+                    <label class="control-label" for="without-performer">Без исполнителя</label>
+                </div>
+                <h4 class="head-card">Период</h4>
+                <div class="form-group">
+                    <label for="period-value"></label>
+                    <select id="period-value">
+                        <option>1 час</option>
+                        <option>12 часов</option>
+                        <option>24 часа</option>
+                    </select>
+                </div>
+                <input type="button" class="button button--blue" value="Искать">
+            </form>
+        </div>
     </div>
-</section>
+</div>
